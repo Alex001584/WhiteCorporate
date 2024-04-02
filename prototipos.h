@@ -1,7 +1,9 @@
 //Prototipos de las funciones
 void MenuPrincipal(); //Men� principal que se muestra al inicio
 
-void lecturaContra(char[100]);
+void movimientoDelCampo(short *seleccion, short direccionalPresionada);
+void registrarEntrada(char cadena[], short *cont, short *posX, char caracter, short campo);
+void lecturaContra(char contra[100]);
 bool inicioSesion(short); //Inicio de sesion
 
 void MenuAdministrador(); //Men� del administrador con sus respectivas opciones

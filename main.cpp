@@ -9,9 +9,11 @@
 //Definiciones para mejor lectura del codigo
 #define CARACTER_CURSOR 175
 #define CARACTER_BLOQUE_PARA_DIBUJO 219
-#define CODIGO_FLECHA 224
+#define CODIGO_FLECHA -32
 #define FLECHA_ARRIBA 72
 #define FLECHA_ABAJO 80
+#define FLECHA_IZQUIERDA 75
+#define FLECHA_DERECHA 77
 
 #include "librerias.h"
 #include "estructuras.h"
@@ -65,6 +67,67 @@ void MenuPrincipal(){
     free(pOpciones);
     system("cls");
     return;
+}
+
+void movimientoDelCampo(short *seleccion, short direccionalPresionada)
+{
+    enum {CAMPO_ADMIN, CAMPO_CAPTURISTA, CAMPO_USUARIO, CAMPO_CONTRA, CAMPO_OK, CAMPO_CANCELAR};
+    
+    switch (*seleccion) {
+    case CAMPO_USUARIO:
+        if (direccionalPresionada == FLECHA_ABAJO) *seleccion = CAMPO_CONTRA;
+        break;
+    case CAMPO_CONTRA:
+        if (direccionalPresionada == FLECHA_ARRIBA) *seleccion = CAMPO_USUARIO;
+        if (direccionalPresionada == FLECHA_ABAJO) *seleccion = CAMPO_ADMIN;
+        break;
+    case CAMPO_ADMIN:
+        if (direccionalPresionada == FLECHA_ARRIBA) *seleccion = CAMPO_CONTRA;
+        if (direccionalPresionada == FLECHA_ABAJO) *seleccion = CAMPO_CANCELAR;
+        if (direccionalPresionada == FLECHA_DERECHA) *seleccion = CAMPO_CAPTURISTA;
+        break;
+    case CAMPO_CAPTURISTA:
+        if (direccionalPresionada == FLECHA_ARRIBA) *seleccion = CAMPO_CONTRA;
+        if (direccionalPresionada == FLECHA_ABAJO) *seleccion = CAMPO_OK;
+        if (direccionalPresionada == FLECHA_IZQUIERDA) *seleccion = CAMPO_ADMIN;
+        break;
+    case CAMPO_OK:
+        if (direccionalPresionada == FLECHA_ARRIBA) *seleccion = CAMPO_CAPTURISTA;
+        if (direccionalPresionada == FLECHA_IZQUIERDA) *seleccion = CAMPO_CANCELAR;
+        break;
+    case CAMPO_CANCELAR:
+        if (direccionalPresionada == FLECHA_ARRIBA) *seleccion = CAMPO_ADMIN;
+        if (direccionalPresionada == FLECHA_DERECHA) *seleccion = CAMPO_OK;
+        break;
+    default:
+        break;
+    }
+
+    return;
+}
+
+void registrarEntrada(char cadena[], short *cont, short *posX, char caracter, short campo)
+{
+    const short size = 100;
+    if (caracter == '\b')
+    {
+        if (*cont > 0)
+        {
+            printf("\b  \b");
+            *posX = *posX - 1;
+            *cont = *cont - 1;
+            cadena[*cont] = '\0';
+        }
+    }
+    else if (*cont < size)
+    {
+        if (campo == CAMPO_USUARIO) printf("%c",caracter);
+        else if (campo == CAMPO_CONTRA) printf("*");
+
+        cadena[*cont] = caracter;
+        *cont = *cont + 1;
+        *posX = *posX + 1;
+    }
 }
 
 void lecturaContra(char contra[100])
@@ -263,32 +326,158 @@ void MenuAdministrador(){
 }
 
 void RegistrarUsuario(){
-    FILE *Fichero; Fichero = fopen("capturistas.txt","a");
-    if (Fichero == NULL)
-    {
-        perror("\nError al abrir el archivo\n\n");
-        exit(-1);
-    }
 
-    USUARIOS nuevo; int v,x;
-    while ((x = getchar() != '\n' && x != EOF));
-    printf("\n--- NUEVO USUARIO ---\n");
-    printf("\nUsuario: ");
-    fgets(nuevo.usuario,100,stdin);
-    nuevo.usuario[strlen(nuevo.usuario)-1] = '\0';
-    printf("\nContrase%ca: ",164);
-    fgets(nuevo.contra,100,stdin);
-    nuevo.contra[strlen(nuevo.contra)-1] = '\0';
+    char cursor; short seleccion = CAMPO_USUARIO, salir = 0, contUsuario = 0, contContra = 0; bool esFlecha = false;
+    USUARIOS nuevo; COORD pos, campoUsuarioPos, campoContraPos, camposMultiSeleccionPos[4];
 
-    v = fprintf(Fichero,"\n%s\t%s",nuevo.usuario,nuevo.contra);
-    if (v < 0)
-    {
-        perror("\nError al escribir al archivo\n\n");
-        exit(-1);
-    }
-    else printf("\nUsuario a%cadido exitosamente\n",164);
+    //Centro
+    obtenerCentroConsola(&pos);
+    const short Xcentro = pos.X;
+
+    //Preparo Y
+    pos.Y -= 3;
     
-    fclose(Fichero);
+    //Imprimo titulo
+    pos.X = Xcentro - 10;
+    gotoxy(pos);
+    caracterPrint("--- NUEVO USUARIO ---");
+
+    //Imprimo las areas de input
+    pos.Y += 2;
+    gotoxy(pos);
+    printf("Usuario: ");
+    campoUsuarioPos.X = pos.X + 9; //Obtengo la posicion de la input
+    campoUsuarioPos.Y = pos.Y;
+
+    pos.Y++;
+    gotoxy(pos);
+    printf("Contrase%ca: ",165);
+    campoContraPos.X = pos.X + 12;
+    campoContraPos.Y = pos.Y;
+
+    pos.Y++;
+    pos.X = Xcentro - 20;
+    gotoxy(pos);
+    printf("Privilegio:  ");
+    camposMultiSeleccionPos[CAMPO_ADMIN].X = pos.X + 13;
+    camposMultiSeleccionPos[CAMPO_ADMIN].Y = pos.Y;
+    camposMultiSeleccionPos[CAMPO_CAPTURISTA].X = camposMultiSeleccionPos[CAMPO_ADMIN].X + 17;
+    camposMultiSeleccionPos[CAMPO_CAPTURISTA].Y = pos.Y;
+
+    printf("  "); //Espacio para colocar el cursor
+    printf("Administrador  ");
+    printf("  ");
+    printf("Capturista");
+
+    pos.Y++;
+    pos.X = Xcentro - 10;
+    gotoxy(pos);
+    printf("  ");
+    printf("Cancelar  ");
+    printf("  ");
+    printf("Ok");
+    camposMultiSeleccionPos[CAMPO_CANCELAR].X = pos.X;
+    camposMultiSeleccionPos[CAMPO_CANCELAR].Y = pos.Y;
+    camposMultiSeleccionPos[CAMPO_OK].X = pos.X + 12;
+    camposMultiSeleccionPos[CAMPO_OK].Y = pos.Y;
+
+    gotoxy(campoUsuarioPos);
+    while ((cursor = getch()) != '\r' || salir == 0)
+    {
+        if (esFlecha)
+        {
+            movimientoDelCampo(&seleccion,cursor);
+
+            switch (seleccion) {
+            case CAMPO_USUARIO:
+                gotoxy(campoUsuarioPos);
+                salir = 0;
+                break;
+            case CAMPO_CONTRA:
+                gotoxy(campoContraPos);
+                salir = 0;
+                break;
+            case CAMPO_ADMIN:
+                gotoxy(camposMultiSeleccionPos[CAMPO_CAPTURISTA]);
+                printf(" ");
+                gotoxy(camposMultiSeleccionPos[CAMPO_ADMIN]);
+                printf("%c",CARACTER_CURSOR);
+                nuevo.privilegio = ADMINISTRADOR;
+                break;
+            case CAMPO_CAPTURISTA:
+                gotoxy(camposMultiSeleccionPos[CAMPO_ADMIN]);
+                printf(" ");
+                gotoxy(camposMultiSeleccionPos[CAMPO_CAPTURISTA]);
+                printf("%c",CARACTER_CURSOR);
+                nuevo.privilegio = CAPTURISTA;
+                break;
+            case CAMPO_OK:
+                gotoxy(camposMultiSeleccionPos[CAMPO_CANCELAR]);
+                printf(" ");
+                gotoxy(camposMultiSeleccionPos[CAMPO_OK]);
+                salir = CAMPO_OK;
+                break;
+            case CAMPO_CANCELAR:
+                gotoxy(camposMultiSeleccionPos[CAMPO_OK]);
+                printf(" ");
+                gotoxy(camposMultiSeleccionPos[CAMPO_CANCELAR]);
+                salir = CAMPO_CANCELAR;
+                break;
+            default:
+                break;
+            }
+
+            esFlecha = false;
+        }
+        else if (isalnum(cursor))
+        {
+            switch (seleccion) {
+            case CAMPO_USUARIO:
+                registrarEntrada(nuevo.usuario,&contUsuario,&campoUsuarioPos.X,cursor,CAMPO_USUARIO);
+                break;
+            case CAMPO_CONTRA:
+                registrarEntrada(nuevo.contra,&contContra,&campoContraPos.X,cursor,CAMPO_CONTRA);
+                break;
+            default:
+                break;
+            }
+        }
+
+        if (cursor == CODIGO_FLECHA) esFlecha = true;
+    }
+
+    if (seleccion == CAMPO_CANCELAR)
+    {
+        return;
+    }
+    else if (seleccion == CAMPO_OK)
+    {
+        FILE *Fichero; short v; char archivo[32];
+        if (nuevo.privilegio == ADMINISTRADOR) strcpy(archivo,"administradores.txt");
+        else if (nuevo.privilegio == CAPTURISTA) strcpy(archivo,"capturistas.txt");
+
+        Fichero = fopen(archivo,"a");
+        if (Fichero == NULL)
+        {
+            system("cls");
+            perror("Error al abrir el archivo\n");
+            system("PAUSE");
+            exit(-1);
+        }
+
+        v = fprintf(Fichero,"%s\t%s",nuevo.usuario,nuevo.contra);
+        if (v < 1)
+        {
+            system("cls");
+            perror("Error al escribir el archivo\n");
+            system("PAUSE");
+            exit(-1);
+        }
+
+        fclose(Fichero);
+    }
+
+    system("cls");
     return;
 }
 
