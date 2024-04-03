@@ -7,6 +7,8 @@
 #include <conio.h>
 
 //Definiciones para mejor lectura del codigo
+#define RUTA_ADMINISTRADOR "administradores.txt"
+#define RUTA_CAPTURISTA "capturistas.txt"
 #define CARACTER_CURSOR 175
 #define CARACTER_BLOQUE_PARA_DIBUJO 219
 #define CODIGO_FLECHA -32
@@ -70,9 +72,7 @@ void MenuPrincipal(){
 }
 
 void movimientoDelCampo(short *seleccion, short direccionalPresionada)
-{
-    enum {CAMPO_ADMIN, CAMPO_CAPTURISTA, CAMPO_USUARIO, CAMPO_CONTRA, CAMPO_OK, CAMPO_CANCELAR};
-    
+{    
     switch (*seleccion) {
     case CAMPO_USUARIO:
         if (direccionalPresionada == FLECHA_ABAJO) *seleccion = CAMPO_CONTRA;
@@ -159,8 +159,8 @@ void lecturaContra(char contra[100])
 bool inicioSesion(short privilegioEsperado)
 {
     USUARIOS activo; char nombreArchivo[32];
-    if (privilegioEsperado == ADMINISTRADOR) strcpy(nombreArchivo,"administradores.txt");
-    else if (privilegioEsperado == CAPTURISTA) strcpy(nombreArchivo,"capturistas.txt");
+    if (privilegioEsperado == ADMINISTRADOR) strcpy(nombreArchivo,RUTA_ADMINISTRADOR);
+    else if (privilegioEsperado == CAPTURISTA) strcpy(nombreArchivo,RUTA_CAPTURISTA);
     else
     {
         printf("\nParametro invalido\n");
@@ -177,6 +177,13 @@ bool inicioSesion(short privilegioEsperado)
 
     //Abro el archivo a usar dependiendo de las credenciales esperadas
     Fichero = fopen(nombreArchivo,"r");
+    if (Fichero == NULL)
+    {
+        system("cls");
+        perror("Erorr al leer el archivo\n");
+        system("PAUSE");
+        exit(-1);
+    }
 
     //Aloco memoria
     lista = (pLISTA_USUARIOS)malloc(sizeof(LISTA_USUARIOS)); //Aloco memoria a la estructura puntero de la lista de usuarios
@@ -335,7 +342,7 @@ void RegistrarUsuario(){
     const short Xcentro = pos.X;
 
     //Preparo Y
-    pos.Y -= 3;
+    pos.Y -= 4;
     
     //Imprimo titulo
     pos.X = Xcentro - 10;
@@ -344,6 +351,7 @@ void RegistrarUsuario(){
 
     //Imprimo las areas de input
     pos.Y += 2;
+    pos.X -= 5;
     gotoxy(pos);
     printf("Usuario: ");
     campoUsuarioPos.X = pos.X + 9; //Obtengo la posicion de la input
@@ -351,11 +359,11 @@ void RegistrarUsuario(){
 
     pos.Y++;
     gotoxy(pos);
-    printf("Contrase%ca: ",165);
+    printf("Contrase%ca: ",164);
     campoContraPos.X = pos.X + 12;
     campoContraPos.Y = pos.Y;
 
-    pos.Y++;
+    pos.Y += 2;
     pos.X = Xcentro - 20;
     gotoxy(pos);
     printf("Privilegio:  ");
@@ -369,7 +377,7 @@ void RegistrarUsuario(){
     printf("  ");
     printf("Capturista");
 
-    pos.Y++;
+    pos.Y += 2;
     pos.X = Xcentro - 10;
     gotoxy(pos);
     printf("  ");
@@ -453,8 +461,8 @@ void RegistrarUsuario(){
     else if (seleccion == CAMPO_OK)
     {
         FILE *Fichero; short v; char archivo[32];
-        if (nuevo.privilegio == ADMINISTRADOR) strcpy(archivo,"administradores.txt");
-        else if (nuevo.privilegio == CAPTURISTA) strcpy(archivo,"capturistas.txt");
+        if (nuevo.privilegio == ADMINISTRADOR) strcpy(archivo,RUTA_ADMINISTRADOR);
+        else if (nuevo.privilegio == CAPTURISTA) strcpy(archivo,RUTA_CAPTURISTA);
 
         Fichero = fopen(archivo,"a");
         if (Fichero == NULL)
@@ -485,7 +493,9 @@ void RegistrarProveedor(){
     FILE *Fichero; Fichero = fopen("proveedores.txt","a");
     if (Fichero == NULL)
     {
-        perror("\nError al abrir el archivo\n\n");
+        system("cls");
+        perror("Error al abrir el archivo\n\n");
+        system("PAUSE");
         exit(-1);
     }
 
@@ -524,7 +534,9 @@ void RegistrarProveedor(){
     v = fprintf(Fichero,"%i\t%s\t%s\t%s\n",nuevo.id,nuevo.nombre,nuevo.direccion,nuevo.telefono);
     if (v < 0)
     {
-        perror("\nError al escribir al archivo\n\n");
+        system("cls");
+        perror("Error al escribir al archivo\n\n");
+        system("PAUSE");
         exit(-1);
     }
     else printf("\n--- PROVEEDOR ESCRITO EXITOSAMENTE ---\n");
