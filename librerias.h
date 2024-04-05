@@ -88,7 +88,7 @@ int crearMenu(const char titulo[], char** opciones, int cantidadOpciones)
     do
     {
         /*
-        Cuando el usuario presiona una flecha getch retorna primero el codigo 224 para indicar que es una flecha del teclado
+        Cuando el usuario presiona una flecha _getch retorna primero el codigo 224 para indicar que es una flecha del teclado
         Despues retorna el codigo de cual flecha fue presionada
 
         Primero capturo el codigo que indica que una flecha fue presionada,
@@ -133,7 +133,7 @@ int crearMenu(const char titulo[], char** opciones, int cantidadOpciones)
 
         if (cursor == CODIGO_FLECHA) esFlechaDelTeclado = true;
 
-    } while ((cursor = getch()) != '\r'); //Cuando el usuario haga una seleccion presionara enter y terminara con el loop de seleccion
+    } while ((cursor = _getch()) != '\r'); //Cuando el usuario haga una seleccion presionara enter y terminara con el loop de seleccion
 
     system("cls");
     return seleccion; //Retorno la seleccion del usuario

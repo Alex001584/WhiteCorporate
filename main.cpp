@@ -134,7 +134,7 @@ void lecturaContra(char contra[100])
 {
     size_t cont = 0; const int size = 100;
 
-    while ((contra[cont] = getch()) != '\r')
+    while ((contra[cont] = _getch()) != '\r')
     {
         if (contra[cont] == '\b')
         {
@@ -390,7 +390,7 @@ void RegistrarUsuario(){
     camposMultiSeleccionPos[CAMPO_OK].Y = pos.Y;
 
     gotoxy(campoUsuarioPos);
-    while ((cursor = getch()) != '\r' || salir == 0)
+    while ((cursor = _getch()) != '\r' || salir == 0)
     {
         if (esFlecha)
         {
