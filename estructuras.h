@@ -37,8 +37,8 @@ struct MATERIA_PRIMA
 enum {CAPTURISTA, ADMINISTRADOR};
 struct USUARIOS
 {
-    char usuario[100];
-    char contra[100];
+    char usuario[50];
+    char contra[50];
     short privilegio;
 };
 
@@ -50,4 +50,4 @@ struct LISTA_USUARIOS
 }; typedef LISTA_USUARIOS* pLISTA_USUARIOS;
 
 //Enum para la seleccion de usuario
-enum {CAMPO_ADMIN, CAMPO_CAPTURISTA, CAMPO_OK, CAMPO_CANCELAR, CAMPO_USUARIO, CAMPO_CONTRA}; //Con enum le doy al campo de admin valor 0 y capturista 1
+enum {ADMIN, CAPTU, OK, CANCELAR, USUARIO, CONTRA}; //Con enum le doy al campo de admin valor 0 y capturista 1

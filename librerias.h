@@ -2,6 +2,27 @@
 #include <windows.h>
 #include <conio.h>
 
+//Definiciones para mejor lectura del codigo
+#define RUTA_ADMINISTRADOR "administradores.txt"
+#define RUTA_CAPTURISTA "capturistas.txt"
+#define CARACTER_BLOQUE_PARA_DIBUJO 219
+#define CARACTER_CURSOR 175
+#define CODIGO_FLECHA 224
+#define CODIGO_FLECHA2 -32
+#define FLECHA_ARRIBA 72
+#define FLECHA_ABAJO 80
+#define FLECHA_IZQUIERDA 75
+#define FLECHA_DERECHA 77
+
+void caracterPrint(const char cadena[])
+{
+    for (int i = 0; i < strlen(cadena); i++)
+    {
+       printf("%c",cadena[i]);
+       Sleep(50);
+    }
+}
+
 void gotoxy(COORD coordenadas)
 {
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE),coordenadas);
@@ -17,15 +38,6 @@ void obtenerCentroConsola(COORD *coordenadas)
     coordenadas->Y = (((bufferInfo.srWindow.Bottom - bufferInfo.srWindow.Top)/2)-1);
     
     return;
-}
-
-void caracterPrint(const char cadena[])
-{
-    for (int i = 0; i < strlen(cadena); i++)
-    {
-       printf("%c",cadena[i]);
-       Sleep(50);
-    }
 }
 
 COORD imprimirStringCentrado(char **string, const short filas, bool esLento)
@@ -52,7 +64,7 @@ COORD imprimirStringCentrado(char **string, const short filas, bool esLento)
     return pos;
 }
 
-int crearMenu(const char titulo[], char** opciones, int cantidadOpciones)
+int menu(const char titulo[], char** opciones, int cantidadOpciones)
 {
     //Obtengo el centro de la consola
     COORD pos;
