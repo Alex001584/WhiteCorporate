@@ -523,13 +523,19 @@ void RegistrarUsuario()
             exit(-1);
         }
 
-        v = fprintf(Fichero,"%s\t%s",nuevo.usuario,nuevo.contra);
+        v = fprintf(Fichero,"\n%s\t%s",nuevo.usuario,nuevo.contra);
         if (v < 1)
         {
             system("cls");
             perror("Error al escribir el archivo\n\n");
             system("PAUSE");
             exit(-1);
+        }
+        else
+        {
+            system("cls"); COORD pos;
+            imprimirStringMenuCentrado("--- USUARIO CREADO EXITOSAMENTE ---",&pos,0);
+            Sleep(100);
         }
     }
 
