@@ -64,7 +64,14 @@ void MenuPrincipal(){
         privilegio = inicioSesion();
         if (privilegio == ADMIN) MenuAdministrador();
         else if (privilegio == CAPTU) MenuCapturista();
-    } while (privilegio != -1);
+        else if (privilegio == -1)
+        {
+            system("cls");
+            COORD pos; obtenerCentroConsola(&pos);
+            imprimirStringMenuCentrado("--- USUARIO O CONTRA INCORRECTOS ---",&pos,0);
+            Sleep(1000);
+        }
+    } while (privilegio == -1);
     
 
     system("cls");

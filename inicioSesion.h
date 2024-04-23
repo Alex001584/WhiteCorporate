@@ -204,6 +204,7 @@ short inicioSesion()
                 bandera = true;
                 break;
             }
+            lista = lista->siguiente;
         }
 
         if (!bandera) privilegio = -1;
