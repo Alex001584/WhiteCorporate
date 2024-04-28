@@ -1,5 +1,13 @@
 //Estructuras
 
+//Estructura fecha
+struct FECHA
+{
+    short dia;
+    short mes;
+    short anio;
+};
+
 //Estructura de datos del proveedor
 struct PROVEEDOR
 {
@@ -9,6 +17,14 @@ struct PROVEEDOR
     char telefono[15];
 };
 
+struct LISTA_PROVEEDOR
+{
+    PROVEEDOR proveedor;
+    LISTA_PROVEEDOR *siguiente;
+    LISTA_PROVEEDOR *anterior;
+};
+typedef LISTA_PROVEEDOR *pLista_Proveedor;
+
 //Estructura de datos de la materia prima
 struct MATERIA_PRIMA
 {
@@ -17,21 +33,31 @@ struct MATERIA_PRIMA
     float cantidad;
 };
 
+struct LISTA_MATERIA_PRIMA
+{
+    MATERIA_PRIMA materia_prima;
+    LISTA_MATERIA_PRIMA *siguiente;
+    LISTA_MATERIA_PRIMA *anterior;
+};
+typedef LISTA_MATERIA_PRIMA *pLista_Materia_Prima;
+
 //Estructura de datos de modelo del producto
-/*typedef struct{
+struct MODELO_PRODUCTO {
     int id;
     char nombre[50];
     int id_materia_prima;
-} ModeloProducto;*/
+};
 
 //Estructura para realizar un pedido a un proveedor
-/*typedef struct{
+struct PEDIDO {
     int id;
     int id_proveedor;
-    int cantidad;
+    int id_materia_prima;
+    float cantidad;
     float monto_total;
-    char fecha_entrega[20];
-} PedidoProveedor;*/
+    FECHA fecha_pedido;
+    FECHA fecha_entrega;
+};
 
 //Estructura de usuario
 enum {CAPTURISTA, ADMINISTRADOR};

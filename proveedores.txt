@@ -1,1 +1,5 @@
-1	prueba	prueba	1234
+4
+1	Productos SLP	Mariano Jimenez 1900	4871169596
+2	Materias Primas CA de CV	Salvador Nava 113	4445127890
+3	Proveedores Saleciano	Juan de Onate 220	4443334567
+4	Supply INC	Himno Nacional 1300	4441425675

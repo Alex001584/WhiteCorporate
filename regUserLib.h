@@ -1,4 +1,4 @@
-void imprimirStringMenuCentrado(const char string[], PCOORD coordenadas, short aumentoEnY)
+void imprimirStringCentrado(const char string[], PCOORD coordenadas, short aumentoEnY)
 {
     COORD centro; obtenerCentroConsola(&centro);
     coordenadas->X = centro.X - strlen(string)/2;
@@ -28,7 +28,7 @@ void imprimirMenuRegistroUsuario(COORD camposPosCursor[6])
     pos.Y -= 4;
 
     //Titulo
-    imprimirStringMenuCentrado("--- NUEVO USUARIO ---",&pos,0);
+    imprimirStringCentrado("--- NUEVO USUARIO ---",&pos,0);
 
     //Posicion en x de los elementos de este punto en adelante
     pos.X = Xcentro - 21;

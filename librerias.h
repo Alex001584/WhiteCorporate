@@ -16,7 +16,7 @@
 
 void caracterPrint(const char cadena[])
 {
-    for (int i = 0; i < strlen(cadena); i++)
+    for (size_t i = 0; i < strlen(cadena); i++)
     {
        printf("%c",cadena[i]);
        Sleep(50);
@@ -40,7 +40,7 @@ void obtenerCentroConsola(COORD *coordenadas)
     return;
 }
 
-COORD imprimirStringCentrado(char **string, const short filas, bool esLento)
+COORD ImprimirArregloDeStrings(char **string, const short filas, bool esLento)
 {
     COORD pos;
     obtenerCentroConsola(&pos);
@@ -48,7 +48,7 @@ COORD imprimirStringCentrado(char **string, const short filas, bool esLento)
     int inicialX = pos.X;
     pos.Y -= (filas/2);
     
-    for (size_t i = 0; i < filas; i++)
+    for (short i = 0; i < filas; i++)
     {
         pos.X -= (strlen(string[i])/2);
         // if (strlen(string[i]) % 2 == 0) pos.X--;
@@ -81,7 +81,7 @@ int menu(const char titulo[], char** opciones, int cantidadOpciones)
     pos.Y+=2;
 
     //Imprimo de manera centrada todas las opciones
-    for (size_t i = 0; i < cantidadOpciones; i++)
+    for (int i = 0; i < cantidadOpciones; i++)
     {
         pos.X = centroX - ( strlen(opciones[i]) / 2 );
         gotoxy(pos);

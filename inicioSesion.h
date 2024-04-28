@@ -50,11 +50,36 @@ void manejoFlechasInicioSesion(char tecla, short *campo, PCOORD camposPos)
     }
 }
 
+void lecturaDinamicaUsuarioContraInicio(char cadena[50], char tecla, short campo, PCOORD camposPosCursor)
+{
+    enum {USUARIO, CONTRA, CANCELAR, OK};
+    short cabeza = strlen(cadena);
+    if (tecla == '\b')
+    {
+        if (cabeza > 0)
+        {
+            cadena[cabeza-1] = '\0';
+            printf("\b \b");
+            camposPosCursor[campo].X--;
+        }
+    }
+    else if (cabeza < 49)
+    {
+        cadena[cabeza] = tecla;
+        cadena[cabeza+1] = '\0';
+        if (campo == USUARIO) printf("%c",tecla);
+        else if (campo == CONTRA) printf("*");
+        camposPosCursor[campo].X++;
+    }
+
+    return;
+}
+
 void leerListaUsuarios(pLISTA_USUARIOS *lista)
 {
     //Declaracion de variables
     FILE *Fichero;
-    int v,x;
+    int v;
 
     //Abro el archivo a usar dependiendo de las credenciales esperadas
     Fichero = fopen("usuarios.txt","r");
@@ -71,7 +96,7 @@ void leerListaUsuarios(pLISTA_USUARIOS *lista)
     (*lista)->usuario = (USUARIOS*)malloc(sizeof(USUARIOS)); //Aloco memoria al sector que lleva los datos de la estructura puntero de usuarios
     
     //Hago la primera lectura de usuario y contra al archivo
-    v = fscanf(Fichero,"%s\t%s\t%d",(*lista)->usuario->usuario,(*lista)->usuario->contra,&(*lista)->usuario->privilegio);
+    v = fscanf(Fichero,"%s\t%s\t%hd",(*lista)->usuario->usuario,(*lista)->usuario->contra,&(*lista)->usuario->privilegio);
     (*lista)->siguiente = NULL; (*lista)->anterior = NULL; //Inicializo los apuntadores
 
     //Creo el loop que lee todos los usuarios y contras del archivo y los coloco en la lista
@@ -83,7 +108,7 @@ void leerListaUsuarios(pLISTA_USUARIOS *lista)
         nuevo->usuario = (USUARIOS*)malloc(sizeof(USUARIOS));
 
         //Le otorgo las credenciales leidas del archivo al nodo
-        v = fscanf(Fichero,"%s\t%s\t%d",nuevo->usuario->usuario,nuevo->usuario->contra,&(nuevo)->usuario->privilegio);
+        v = fscanf(Fichero,"%s\t%s\t%hd",nuevo->usuario->usuario,nuevo->usuario->contra,&(nuevo)->usuario->privilegio);
 
         //Inicializo los apuntadores
         nuevo->siguiente = NULL;
@@ -145,7 +170,7 @@ short inicioSesion()
     const short Xcentro = pos.X;
     pos.Y -= 3;
 
-    imprimirStringMenuCentrado("--- INICIO DE SESION ---",&pos,0);
+    imprimirStringCentrado("--- INICIO DE SESION ---",&pos,0);
 
     //Usuario
     pos.Y += 2;
@@ -163,7 +188,7 @@ short inicioSesion()
     camposPos[CONTRA].Y = pos.Y;
 
     //Cancelar y Ok
-    imprimirStringMenuCentrado("  Cancelar    Ok",&pos,2);
+    imprimirStringCentrado("  Cancelar    Ok",&pos,2);
     camposPos[CANCELAR].X = pos.X;
     camposPos[CANCELAR].Y = pos.Y;
     camposPos[OK].X = pos.X + 12;
@@ -181,8 +206,8 @@ short inicioSesion()
         }
         else if (isalnum(tecla) || tecla == '\b')
         {
-            if (campo == USUARIO) lecturaDinamicaUsuarioContra(activo.usuario,tecla,4,camposPos);
-            else if (campo == CONTRA) lecturaDinamicaUsuarioContra(activo.contra,tecla,5,camposPos);
+            if (campo == USUARIO) lecturaDinamicaUsuarioContraInicio(activo.usuario,tecla,USUARIO,camposPos);
+            else if (campo == CONTRA) lecturaDinamicaUsuarioContraInicio(activo.contra,tecla,CONTRA,camposPos);
         }
 
         esFlecha = (tecla == CODIGO_FLECHA2) ? true : false;
@@ -194,7 +219,7 @@ short inicioSesion()
         pLISTA_USUARIOS lista;
         leerListaUsuarios(&lista);
 
-        while (lista->siguiente != NULL)
+        while (lista != NULL)
         {
             if (strcmp(lista->usuario->usuario,activo.usuario) == 0 && strcmp(lista->usuario->contra,activo.contra) == 0)
             {
@@ -215,7 +240,7 @@ short inicioSesion()
     {
         system("cls");
         obtenerCentroConsola(&pos);
-        imprimirStringMenuCentrado("--- OPERACION CANCELADA ---",&pos,0);
+        imprimirStringCentrado("--- OPERACION CANCELADA ---",&pos,0);
         Sleep(100);
         exit(0);
     }
