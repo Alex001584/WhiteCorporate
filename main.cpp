@@ -745,6 +745,7 @@ void MenuCapturista(){
             "Generar reporte de modelos por materia prima",
             "Generar reporte del total de material en inventario",
             "Generar reporte de pedidos de materia prima a proveedores",
+            "Generar reporte en archivos xls",
             "Volver al inicio de sesion"
         };
 
@@ -773,9 +774,13 @@ void MenuCapturista(){
                 break;
                 
             case 4:
+                GenerarArchivosReporte();
+                break;
+            
+            case 5:
                 MenuPrincipal();
                 break;
-                
+
             default:
                 break;
         }
@@ -1089,6 +1094,172 @@ void PedidosMatPriProveedores(){
     return;
 }
 
+void GenerarArchivosReporte()
+{
+    system("cls");
+    COORD pos;
+    obtenerCentroConsola(&pos);
+    pos.Y-=2;
+    FILE *Fichero;
+    imprimirStringCentrado("Generando archivos...",&pos,0);
+
+    //Productos
+    pLista_Modelo_Producto productos;
+    pLista_Materia_Prima materias_primas;
+    obtenerProductos(&productos);
+    obtenerMateriasPrimas(&materias_primas);
+    
+    Fichero = fopen("reporteProductos.xls","w+");
+    if (Fichero == NULL)
+    {
+        system("cls");
+        perror("\nError al abrir/crear el archivo\n\n");
+        system("PAUSE");
+        exit(-1);
+    }
+
+    int v;
+    v = fprintf(Fichero,"ID\tNombre del modelo\tID Materia\tNombre Materia\tCantidad de Materia\n");
+    if (v < 1)
+    {
+        system("cls");
+        perror("\nError al escribir al archivo\n\n");
+        system("PAUSE");
+        exit(-1);
+    }
+
+    pLista_Modelo_Producto primero = productos;
+    pLista_Materia_Prima cabeza;
+    do
+    {
+        cabeza = materias_primas;
+        while (cabeza != NULL)
+        {
+            if (cabeza->materia_prima.id == productos->modelos.id_materia_prima) break;
+            else cabeza = cabeza->siguiente;
+        }
+
+        v = fprintf(Fichero,"%i\t%s\t%i\t%s\t%.2f\n",productos->modelos.id,productos->modelos.nombre,productos->modelos.id_materia_prima,cabeza->materia_prima.nombre,cabeza->materia_prima.cantidad);
+
+        productos = productos->siguiente;
+    } while (productos != primero);
+    
+    liberarProductos(&productos);
+    fclose(Fichero);
+
+    //Total de materia en inventario
+    Fichero = fopen("reporteInventario.xls","w+");
+    if (Fichero == NULL)
+    {
+        system("cls");
+        perror("\nError al abrir/crear el archivo\n\n");
+        system("PAUSE");
+        exit(-1);
+    }
+
+    v = fprintf(Fichero,"ID\tNombre\t\tCantidad (kg)\n");
+    if (v < 1)
+    {
+        system("cls");
+        perror("\nError al escribir al archivo\n\n");
+        system("PAUSE");
+        exit(-1);
+    }
+
+    cabeza = materias_primas;
+    while (cabeza != NULL)
+    {
+        fprintf(Fichero,"%i\t%s\t\t%.2f\n",cabeza->materia_prima.id,cabeza->materia_prima.nombre,cabeza->materia_prima.cantidad);
+        cabeza = cabeza->siguiente;
+    }
+    fclose(Fichero);
+
+    //Pedidos de materia prima
+    Fichero = fopen("reportePedidos.xls","w+");
+    if (Fichero == NULL)
+    {
+        system("cls");
+        perror("\nError al abrir/crear el archivo\n\n");
+        system("PAUSE");
+        exit(-1);
+    }
+
+    v = fprintf(Fichero,"ID\tCantidad\tCosto\tFechaPedido\tFechaEntrega\tID Proveedor\tNombre\tDireccion\tTelefono\tID Materias\tNombre\tCantidad\n");
+    if (v < 1)
+    {
+        system("cls");
+        perror("\nError al escribir al archivo\n\n");
+        system("PAUSE");
+        exit(-1);
+    }
+
+    pLista_Proveedor proveedores;
+    pLista_Pedido pedidos;
+    obtenerProveedores(&proveedores);
+    obtenerPedidos(&pedidos);
+
+    pLista_Pedido primero_pedidos = pedidos;
+    do
+    {
+        pLista_Materia_Prima cabeza_materias = materias_primas;
+        while (cabeza_materias != NULL && v > 0)
+        {
+            if (cabeza_materias != NULL)
+            {
+                if (cabeza_materias->materia_prima.id == pedidos->pedido.id_materia_prima) break;
+                else cabeza_materias = cabeza_materias->siguiente;
+            }
+        }
+
+        pLista_Proveedor cabeza_proveedores = proveedores;
+        while (cabeza_proveedores != NULL && v > 0)
+        {
+            if (cabeza_proveedores != NULL)
+            {
+                if (cabeza_proveedores->proveedor.id == pedidos->pedido.id_proveedor) break;
+                else cabeza_proveedores = cabeza_proveedores->siguiente;
+            }
+        }
+
+        fprintf(Fichero,"%i\t%.2f\t%.2f\t%.2i/%.2i/%.2i\t%.2i/%.2i/%.2i\t%i\t%s\t%s\t%s\t%i\t%s\t%.2f\n",
+
+            pedidos->pedido.id,
+            pedidos->pedido.cantidad,
+            pedidos->pedido.monto_total,
+
+            pedidos->pedido.fecha_pedido.dia,
+            pedidos->pedido.fecha_pedido.mes,
+            pedidos->pedido.fecha_pedido.anio,
+
+            pedidos->pedido.fecha_entrega.dia,
+            pedidos->pedido.fecha_entrega.mes,
+            pedidos->pedido.fecha_entrega.anio,
+
+            cabeza_proveedores->proveedor.id,
+            cabeza_proveedores->proveedor.nombre,
+            cabeza_proveedores->proveedor.direccion,
+            cabeza_proveedores->proveedor.telefono,
+
+            cabeza_materias->materia_prima.id,
+            cabeza_materias->materia_prima.nombre,
+            cabeza_materias->materia_prima.cantidad
+
+        );
+
+        pedidos = pedidos->siguiente;
+    } while (pedidos != primero_pedidos);
+
+    liberarPedidos(&pedidos);
+    liberarProveedores(&proveedores);
+    liberarMateriasPrimas(&materias_primas);
+    fclose(Fichero);
+
+    imprimirStringCentrado("Archivos Generados exitosamente",&pos,1);
+    imprimirStringCentrado("Presione una tecla para continuar",&pos,2);
+    _getch();
+    return;
+}
+
 int main() {
     
     imprimirPortada();
@@ -1096,6 +1267,6 @@ int main() {
 
     system("cls");
     MenuPrincipal();
-    
+
     return 0;
 }

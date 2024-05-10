@@ -166,3 +166,133 @@ void liberarProveedores(pLista_Proveedor *lista)
 
     return;
 }
+
+void obtenerProductos(pLista_Modelo_Producto *lista)
+{
+    FILE *Fichero = fopen("modelos.txt","r");
+    if (Fichero == NULL)
+    {
+        system("cls");
+        perror("\nError al abrir el archivo\n\n");
+        system("PAUSE");
+        exit(-1);
+    }
+
+    int v,n;
+    v = fscanf(Fichero,"%i\n",&n);
+    if (v < 1)
+    {
+        system("cls");
+        perror("\nError al leer el archivo\n\n");
+        system("PAUSE");
+        exit(-1);
+    }
+    
+    pLista_Modelo_Producto primero = *lista;
+    pLista_Modelo_Producto anterior;
+    MODELO_PRODUCTO nuevo;
+
+    while ((v = fscanf(Fichero,"%i\t%[^\t]\t%i",&nuevo.id,nuevo.nombre,&nuevo.id_materia_prima)) > 0 || !feof(Fichero))
+    {
+        *lista = (pLista_Modelo_Producto)malloc(sizeof(LISTA_MODELO_PRODUCTO));
+        if (nuevo.id == 1) {anterior = *lista; primero = *lista;}
+
+        anterior->siguiente = *lista;
+        (*lista)->siguiente = NULL;
+        (*lista)->anterior = anterior;
+        anterior = *lista;
+
+        (*lista)->modelos = nuevo;
+        *lista = (*lista)->siguiente;
+    }
+    *lista = anterior;
+    (*lista)->siguiente = primero;
+    primero->anterior = *lista;
+
+    fclose(Fichero);
+    return;
+}
+
+void liberarProductos(pLista_Modelo_Producto *lista)
+{
+    pLista_Modelo_Producto primero = *lista;
+    do
+    {
+        *lista = (*lista)->siguiente;
+        if (*lista != primero) free((*lista)->anterior);
+        else break;
+    } while (*lista != primero);
+    return;
+}
+
+void obtenerPedidos(pLista_Pedido *lista)
+{
+    FILE *Fichero = fopen("pedidos.txt","r");
+    if (Fichero == NULL)
+    {
+        system("cls");
+        perror("\nError al abrir el archivo\n\n");
+        system("PAUSE");
+        exit(-1);
+    }
+
+    int v,n;
+    v = fscanf(Fichero,"%i\n",&n);
+    if (v < 1)
+    {
+        system("cls");
+        perror("\nError al leer el archivo\n\n");
+        system("PAUSE");
+        exit(-1);
+    }
+    
+    pLista_Pedido primero = *lista;
+    pLista_Pedido anterior;
+    PEDIDO nuevo;
+
+    while ((
+            v = fscanf(Fichero,"%i\t%i\t%i\t%f\t%f\t%hi\t%hi\t%hi\t%hi\t%hi\t%hi",
+            &nuevo.id,
+            &nuevo.id_proveedor,
+            &nuevo.id_materia_prima,
+            &nuevo.cantidad,
+            &nuevo.monto_total,
+            &nuevo.fecha_pedido.dia,
+            &nuevo.fecha_pedido.mes,
+            &nuevo.fecha_pedido.anio,
+            &nuevo.fecha_entrega.dia,
+            &nuevo.fecha_entrega.mes,
+            &nuevo.fecha_entrega.anio
+        )
+    ) > 0 || !feof(Fichero))
+    {
+        *lista = (pLista_Pedido)malloc(sizeof(LISTA_PEDIDO));
+        if (nuevo.id == 1) {anterior = *lista; primero = *lista;}
+
+        anterior->siguiente = *lista;
+        (*lista)->siguiente = NULL;
+        (*lista)->anterior = anterior;
+        anterior = *lista;
+
+        (*lista)->pedido = nuevo;
+        *lista = (*lista)->siguiente;
+    }
+    *lista = anterior;
+    (*lista)->siguiente = primero;
+    primero->anterior = *lista;
+
+    fclose(Fichero);
+    return;
+}
+
+void liberarPedidos(pLista_Pedido *lista)
+{
+    pLista_Pedido primero = *lista;
+    do
+    {
+        *lista = (*lista)->siguiente;
+        if (*lista != primero) free((*lista)->anterior);
+        else break;
+    } while (*lista != primero);
+    return;
+}

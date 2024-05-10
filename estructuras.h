@@ -48,6 +48,14 @@ struct MODELO_PRODUCTO {
     int id_materia_prima;
 };
 
+struct LISTA_MODELO_PRODUCTO
+{
+    MODELO_PRODUCTO modelos;
+    LISTA_MODELO_PRODUCTO *siguiente;
+    LISTA_MODELO_PRODUCTO *anterior;
+};
+typedef LISTA_MODELO_PRODUCTO *pLista_Modelo_Producto;
+
 //Estructura para realizar un pedido a un proveedor
 struct PEDIDO {
     int id;
@@ -58,6 +66,14 @@ struct PEDIDO {
     FECHA fecha_pedido;
     FECHA fecha_entrega;
 };
+
+struct LISTA_PEDIDO
+{
+    PEDIDO pedido;
+    LISTA_PEDIDO *siguiente;
+    LISTA_PEDIDO *anterior;
+};
+typedef LISTA_PEDIDO *pLista_Pedido;
 
 //Estructura de usuario
 enum {CAPTURISTA, ADMINISTRADOR};

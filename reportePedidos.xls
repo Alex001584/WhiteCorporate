@@ -1,0 +1,5 @@
+ID	Cantidad	Costo	FechaPedido	FechaEntrega	ID Proveedor	Nombre	Direccion	Telefono	ID Materias	Nombre	Cantidad
+4	1230.50	30000.00	27/04/2024	12/05/2024	3	Proveedores Saleciano	Juan de Onate 220	4443334567	5	Cristal	98769.50
+1	123123.00	123123.00	28/04/2024	30/04/2024	1	Productos SLP	Mariano Jimenez 1900	4871169596	1	Asfalto	13000.00
+2	20000.00	5000.00	28/04/2024	30/04/2024	1	Productos SLP	Mariano Jimenez 1900	4871169596	2	Roca	98999.80
+3	1000.20	130000.00	28/04/2024	03/05/2024	3	Proveedores Saleciano	Juan de Onate 220	4443334567	2	Roca	98999.80

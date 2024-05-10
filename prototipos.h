@@ -19,11 +19,10 @@ void RegistrarUsuario();
 void RegistrarProveedor();
 void RegistrarMatePrim();
 void RegistrarModelos();
-void GestionProductos();
-void PedidosProveedores();
 
 void MenuCapturista(); //Men� del capturista con sus respectivas opciones
 void PedidoMateriaPrima();
 void ReporteModelos();
 void ReporteInventario();
 void PedidosMatPriProveedores();
+void GenerarArchivosReporte();
